@@ -1,0 +1,63 @@
+import { Button, ComboBox, LineEdit } from "std-widgets.slint";
+component Header inherits Rectangle {
+    height: 50px;
+    Text {
+        text: "Doom Launcher";
+        font-size: 40px;
+        font-family: "Bebas Neue";
+        width: 562px;
+        x: 170px;
+        y: 14px;
+        height: 44px;
+    }
+}
+component ListEngine inherits Rectangle{
+    in property <[string]> engines;
+    in-out property <int> selected-engine;
+    ComboBox {
+        height: 56px;
+        model: engines;
+        width: 594px;
+        x: 20px;
+        y: 184px;
+    }
+}
+export component MainWindow inherits Window {
+    callback launch();
+    callback add_engine();
+    in property <[string]> engines;
+    in-out property <int> selected-engine;
+    title: "DoomLauncher";
+    icon: @image-url("../icon.png");
+    width:  800px;
+    always-on-top: false;
+    height: 600px;
+    Header {
+        x: 64px;
+        y: 27px;
+    }
+    
+    ListEngine {
+        engines: root.engines;
+        Button {
+            width: 86px;
+            height: 27px;
+            x: 703px;
+            y: 5px;
+            text: "Add Engine";
+            clicked => {
+                add_engine()
+            }
+        }
+    }
+    Button {
+        height: 30px;
+        text: "Start";
+        x: 24px;
+        y: 552px;
+        clicked => {
+            launch();
+        }
+    }
+    
+}
