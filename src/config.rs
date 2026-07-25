@@ -8,33 +8,46 @@ pub struct Engine {
     icon: Option<PathBuf>,
 }
 #[derive(Serialize, Deserialize)]
-pub struct Engines {
+pub struct Engines<> {
     engine: Vec<Engine>,
+
 }
 
+impl Engine {
+    pub fn create(name : &str)-> Engine{
+        Engine{
+            name : name.to_string(),
+            executable: PathBuf::new(),
+            icon: None,
+        }
+    }
+}
+pub fn save_config(config : &mut Vec<Engine>) -> Result<(),Box<dyn std::error::Error>>{
+    let mut  engines = Engines{engine: vec![] };
+    engines.engine.append(config);
+    let toml  = toml::to_string(&engines);
+    match fs::write("engines.toml", toml?)? {
+        _ => {} };
+    Ok(())
+}
 pub fn create_config() -> Result<(), Box<dyn std::error::Error>> {
     let config = Engines{
         engine : vec![
-            Engine{
-                name : "GZDoom".into(),
-                executable: PathBuf::new(),
-                icon: None,
-        }]
+            Engine::create("GZDoom")
+        ]
     };
     let toml_string = toml::to_string_pretty(&config)?;
     match fs::exists("engines.toml") {
         Ok(bool) => {
             print!("{bool}");
-            if bool==false {
+            if bool == false {
                 fs::write("engines.toml", toml_string)?
             }
         },
         Err(e) => println!("Erreur at {e}")
     }
-    
     Ok(())
 }
-
 
 
 pub fn load_engines() -> Vec<Engine> {
