@@ -1,63 +1,67 @@
-import { Button, ComboBox, LineEdit } from "std-widgets.slint";
-component Header inherits Rectangle {
-    height: 50px;
-    Text {
-        text: "Doom Launcher";
-        font-size: 40px;
-        font-family: "Bebas Neue";
-        width: 562px;
-        x: 170px;
-        y: 14px;
-        height: 44px;
-    }
-}
-component ListEngine inherits Rectangle{
-    in property <[string]> engines;
-    in-out property <int> selected-engine;
-    ComboBox {
-        height: 56px;
-        model: engines;
-        width: 594px;
-        x: 20px;
-        y: 184px;
-    }
-}
+import { Header } from "header.slint";
+import { EngineSelector } from "engine-selector.slint";
+import { BottomBar } from "bottom-bar.slint";
+import { EditEngineDialog } from "edit-engine-dialog.slint";
+
 export component MainWindow inherits Window {
+    callback cancel_option();
+    callback option();
     callback launch();
+    callback remove_engine();
     callback add_engine();
+    in property <bool> option_open;
     in property <[string]> engines;
     in-out property <int> selected-engine;
+
+    width: 800px;
+    height: 600px;
+
     title: "DoomLauncher";
     icon: @image-url("../icon.png");
-    width:  800px;
-    always-on-top: false;
-    height: 600px;
+
     Header {
         x: 64px;
         y: 27px;
     }
-    
-    ListEngine {
+    EditEngineDialog {
+        visible: option_open;
+        cancel_option => {
+            root.cancel_option();
+        }
+    }
+    EngineSelector {
+
+        x: 0px;
+        y: 184px;
+        visible: !option_open;
         engines: root.engines;
-        Button {
-            width: 86px;
-            height: 27px;
-            x: 703px;
-            y: 5px;
-            text: "Add Engine";
-            clicked => {
-                add_engine()
-            }
+
+        selected-engine <=> root.selected-engine;
+
+        add => {
+            root.add_engine();
+        }
+
+        remove => {
+            root.remove_engine();
+        }
+
+        option => {
+            root.option();
+        }
+        Text {
+            text: selected-engine;
         }
     }
-    Button {
-        height: 30px;
-        text: "Start";
-        x: 24px;
+
+    BottomBar {
+
+        x: 0px;
         y: 552px;
-        clicked => {
-            launch();
+
+        launch => {
+            root.launch();
         }
+        visible: !option_open;
     }
-    
 }

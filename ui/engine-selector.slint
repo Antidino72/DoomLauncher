@@ -1,0 +1,57 @@
+import { Button, ComboBox } from "std-widgets.slint";
+
+export component EngineSelector inherits Rectangle {
+
+    callback add();
+    callback remove();
+    callback option();
+    visible: root.visible;
+    in property <[string]> engines;
+    in-out property <int> selected-engine;
+
+    ComboBox {
+        x: 20px;
+        y: 0px;
+        width: 594px;
+        height: 65px;
+
+        model: root.engines;
+        current-index: root.selected-engine;
+
+        changed current-index => {
+            root.selected-engine = self.current-index;
+        }
+    }
+
+    Button {
+        text: "Add";
+        width: 68px;
+        x: 620px;
+        y: 0px;
+
+        clicked => {
+            root.add();
+        }
+    }
+
+    Button {
+        text: "Remove";
+        width: 68px;
+        x: 620px;
+        y: 35px;
+
+        clicked => {
+            root.remove();
+        }
+    }
+
+    Button {
+        text: "Option";
+        x: 694px;
+        y: 34px;
+
+        clicked => {
+            root.option();
+        }
+    }
+}

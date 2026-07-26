@@ -1,0 +1,20 @@
+import { Button } from "std-widgets.slint";
+export component EditEngineDialog inherits Rectangle {
+    in-out property <bool> open;
+    in-out property <string> name;
+    in-out property <string> executable;
+    visible: root.open;
+    callback save();
+    callback cancel_option();
+    width: 800px;
+    background: #000000;
+    Button {
+        text: "Cancel";
+
+        y: 10px;
+        x: 14px;
+        clicked => {
+            root.cancel_option();
+        }
+    }
+}

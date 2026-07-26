@@ -1,3 +1,4 @@
 [[engine]]
-name = "GZDoom"
-executable = ""
+name = "odamex"
+executable = 'C:\Users\antidino\AppData\Local\Programs\Odamex\odamex.exe'
+default_args = ""
