@@ -1,18 +1,102 @@
-import { Button } from "std-widgets.slint";
+import { Button, LineEdit, TextEdit, TextEdit, TextEdit, HorizontalBox } from "std-widgets.slint";
+import { Header } from "header.slint";
 export component EditEngineDialog inherits Rectangle {
     in-out property <bool> open;
     in-out property <string> name;
     in-out property <string> executable;
+    in-out property <string> icon;
     visible: root.open;
     callback save();
     callback cancel_option();
     width: 800px;
-    background: #000000;
+    height: 800px;
+    Header {
+        y: -1px;
+        x: 424px;}
+
+    //name of engine
+    Text {
+        height: 27px;
+        text: "Name";
+        font-size: 20px;
+        x: 66px;
+        y: 171px;
+    }
+    LineEdit {
+        height: 30px;
+        font-size: 24px;
+        text: name;
+        y: 209px;
+        x: 60px;
+        width: 350px;
+
+    }
+
+    //executable path
+    Text {
+        text: "Executable path";
+        font-size: 20px;
+        y: 328px;
+        x: 64px;
+    }
+    LineEdit {
+        font-size: 20px;
+        height: 30px;
+        text: executable;
+        y: 466px;
+        width: 350px;
+        x: 60px;
+    }
+    Button {
+        text: "Change path";
+        y: 466px;
+        x: 417px;
+    }
+
+    //icon path
+    Text {
+        text: "Icon path";
+        font-size: 20px;
+        y: 428px;
+        x: 64px;
+    }
+    Image {
+        height: 40px;
+        source: @image-url("../icon.png");
+        y: 464px;
+        width: 40px;
+        x: 526px;
+    }
+    LineEdit {
+        font-size: 20px;
+        height: 30px;
+        text: icon;
+        y: 366px;
+        width: 350px;
+        x: 60px;
+    }
+    Button {
+        text: "Change path";
+        y: 366px;
+        x: 417px;
+    }
+
+
+    //save and cancel
     Button {
         text: "Cancel";
-
-        y: 10px;
-        x: 14px;
+        width: 65px;
+        y: 648px;
+        x: 628px;
+        clicked => {
+            root.cancel_option();
+        }
+    }
+    Button {
+        text: "Save";
+        width: 65px;
+        y: 648px;
+        x: 710px;
         clicked => {
             root.cancel_option();
         }

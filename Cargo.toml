@@ -1,5 +1,5 @@
 [package]
-name = "slint-rust-template"
+name = "DoomLuncher"
 version = "0.1.0"
 edition = "2024"
 
@@ -12,7 +12,7 @@ toml = "0.8"
 dirs = "6.0.0"
 rfd = "0.17.2"
 [build-dependencies]
-slint-build = "1.16.1"
+slint-build = "1.17.1"
 
 [profile.release]
 codegen-units = 1

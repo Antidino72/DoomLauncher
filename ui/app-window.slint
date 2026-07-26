@@ -20,8 +20,7 @@ export component MainWindow inherits Window {
     icon: @image-url("../icon.png");
 
     Header {
-        x: 64px;
-        y: 27px;
+
     }
     EditEngineDialog {
         visible: option_open;
@@ -37,20 +36,14 @@ export component MainWindow inherits Window {
         engines: root.engines;
 
         selected-engine <=> root.selected-engine;
-
         add => {
             root.add_engine();
         }
-
         remove => {
             root.remove_engine();
         }
-
         option => {
             root.option();
-        }
-        Text {
-            text: selected-engine;
         }
     }
 
