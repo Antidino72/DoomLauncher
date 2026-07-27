@@ -1,17 +1,17 @@
 [[engine]]
-name = "gzdoom"
-executable = 'C:\Users\antidino\Desktop\gzdoom-4-14-2-windows\gzdoom.exe'
-icon = ""
-default_args = ""
-
-[[engine]]
 name = "odamex"
-executable = 'C:\Users\antidino\Documents\My Games\Odamex\odamex.cfg'
+executable = 'C:\Users\antidino\AppData\Local\Programs\Odamex\odamex.exe'
 icon = ""
 default_args = ""
 
 [[engine]]
-name = "zandronum"
-executable = 'C:\Users\antidino\AppData\Local\Zandronum\zandronum.exe'
+name = "gzdoom"
+executable = 'C:\Users\antidino\Desktop\Jeu\Doom\gzdoom-4-14-2-windows\gzdoom.exe'
+icon = ""
+default_args = ""
+
+[[engine]]
+name = "uzdoom"
+executable = 'C:\Users\antidino\Desktop\Jeu\Doom\Windows-UZDoom-4.14.3\uzdoom.exe'
 icon = ""
 default_args = ""

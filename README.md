@@ -18,7 +18,7 @@ A simple launcher written in Rust and Slint to easily manage your Doom engines, 
 
 ```bash
 # Clone the repository
-git clone [https://github.com/Antidino72/DoomLauncher.git](https://github.com/Antidino72/DoomLauncher.git) 
+git clone https://github.com/Antidino72/DoomLauncher.git
 
 # Run in dev mode 
 cargo run

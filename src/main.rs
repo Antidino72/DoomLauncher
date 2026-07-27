@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Antoine Veillé
 // SPDX-License-Identifier: CC-BY-SA-4.0
-
+use std::process::Command;
 use slint::{ModelRc, VecModel, SharedString};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -114,14 +114,15 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
     let window_handle_option = window.clone_strong();
-
+    let engines_ref = engines.clone();
     window.on_option(move || {
         let window = window_handle_option.clone_strong();
         let index = window.get_selected_engine();
         if index < 0 {
             return; // Aucun élément sélectionné
         }
-        let engines_ref = engines.borrow();
+
+        let engines_ref = engines_ref.borrow();
         if let Some(current_engine) = engines_ref.get(index as usize) {
             //Nom de l'engine
             window.set_name_engine(SharedString::from(&current_engine.name));
@@ -214,9 +215,72 @@ fn main() -> Result<(), slint::PlatformError> {
             }
         }
     });
-    window.on_launch(|| {
+    let engines_launch = engines.clone();
+    let iwads_launch = iwads.clone();
+    let window_handle_launch = window.clone_strong();
 
-        println!("Lancement de Doom !");
+    window.on_launch(move || {
+        let window = &window_handle_launch;
+
+        let engine_index = window.get_selected_engine();
+        let iwad_index = window.get_selected_iwad();
+
+        // Vérification engine
+        let engines_ref = engines_launch.borrow();
+        let Some(engine) = engines_ref.get(engine_index as usize) else {
+            MessageDialog::new()
+                .set_level(MessageLevel::Error)
+                .set_title("Error")
+                .set_description("No engine selected.")
+                .show();
+            return;
+        };
+
+        // Vérification que l'executable existe
+        if engine.executable.as_os_str().is_empty() {
+            MessageDialog::new()
+                .set_level(MessageLevel::Error)
+                .set_title("Error")
+                .set_description("The engine does not have an executable configured.")
+                .show();
+            return;
+        }
+
+        // Vérification IWAD
+        let iwads_ref = iwads_launch.borrow();
+        let Some(iwad) = iwads_ref.iwad.get(iwad_index as usize) else {
+            MessageDialog::new()
+                .set_level(MessageLevel::Error)
+                .set_title("Error")
+                .set_description("No IWAD selected.")
+                .show();
+            return;
+        };
+
+        if iwad.path.as_os_str().is_empty() {
+            MessageDialog::new()
+                .set_level(MessageLevel::Error)
+                .set_title("E")
+                .set_description("The IWAD does not have a configured path.")
+                .show();
+            return;
+        }
+
+        // Lancement
+        match Command::new(&engine.executable)
+            .arg("-iwad")
+            .arg(&iwad.path)
+            .spawn()
+        {
+            Ok(_) => println!("Doom Started !"),
+            Err(e) => {
+                MessageDialog::new()
+                    .set_level(MessageLevel::Error)
+                    .set_title("Erreur de lancement")
+                    .set_description(&format!("Unable to start engine:\n{e}"))
+                    .show();
+            }
+        }
     });
 
     window.run()

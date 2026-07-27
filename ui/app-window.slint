@@ -5,6 +5,7 @@ import { Header } from "design/header.slint";
 import { EngineSelector } from "engine/engine-selector.slint";
 import { iwad_selector } from "wads/iwad_selector.slint";
 import { EditEngineDialog } from "engine/edit-engine-dialog.slint";
+import { Button } from "std-widgets.slint";
 
 export component MainWindow inherits Window {
 
@@ -63,6 +64,7 @@ export component MainWindow inherits Window {
                 option => {
                     root.option();
                 }
+
             }
     iwad-selector {
         height: 105px;
@@ -93,5 +95,14 @@ export component MainWindow inherits Window {
                 icon-engine: root.icon-engine;
                 icon-path: root.icon-path;
 
+    }
+    Button {
+        y: 550px;
+        width: 73px;
+        x: 703px;
+        text: "Start";
+        clicked => {
+            launch()
+        }
     }
 }
