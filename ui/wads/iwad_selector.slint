@@ -1,0 +1,54 @@
+// Copyright (c) 2026 Antoine Veillé
+// SPDX-License-Identifier: CC-BY-SA-4.0
+
+import { Button, ComboBox, TextEdit } from "std-widgets.slint";
+
+export component iwad_selector inherits Rectangle {
+
+    callback add_iwad();
+    callback remove_iwad();
+    in property <[string]> iwads;
+    in-out property <int> selected-iwad;
+    Text {
+        text: "Iwad";
+        y: 145px;
+        x: 30px;
+        font-size: 30px;
+    }
+    ComboBox {
+        x: 10px;
+        y: 180px;
+        width: 594px;
+        height: 65px;
+
+        model: root.iwads;
+        current-index: root.selected-iwad;
+
+        changed current-index => {
+            root.selected-iwad = self.current-index;
+        }
+    }
+
+    Button {
+        text: "Add";
+        width: 72px;
+        x: 602px;
+        y: 179px;
+
+        clicked => {
+            root.add_iwad();
+        }
+    }
+
+    Button {
+        text: "Remove";
+        width: 68px;
+        x: 605px;
+        y: 213px;
+
+        clicked => {
+            root.remove_iwad();
+        }
+    }
+
+}

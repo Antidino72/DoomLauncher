@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 
 import { Button, LineEdit, TextEdit, TextEdit, TextEdit, HorizontalBox } from "std-widgets.slint";
-import { Header } from "header.slint";
+import { Header } from "../design//header.slint";
 export component EditEngineDialog inherits Rectangle {
     in-out property <bool> open;
     in property <string> name;
@@ -14,11 +14,7 @@ export component EditEngineDialog inherits Rectangle {
     callback cancel_option();
     width: 800px;
     height: 800px;
-    Header {
-        y: -1px;
-        height: 62px;
-        width: 446px;
-        x: 424px;}
+
 
     //name of engine
     Text {
@@ -61,9 +57,18 @@ export component EditEngineDialog inherits Rectangle {
         y: 428px;
         x: 64px;
     }
+
     TouchArea {
+        height: 128px;
+        width: 123px;
+        y: 424px;
+        x: 432px;
         Rectangle {
             border-color: #ffffff;
+            height: 64px;
+            y: 432px;
+            width: 69px;
+            x: 410px;
         }
         Image {
             source: root.icon-engine;
@@ -85,28 +90,28 @@ export component EditEngineDialog inherits Rectangle {
 
     Button {
         text: "Change path";
-        y: 366px;
+        y: 466px;
         x: 417px;
     }
 
 
     //save and cancel
     Button {
-        text: "Cancel";
+        text: "Save";
         width: 65px;
-        y: 648px;
-        x: 628px;
+        y: 552px;
+        x: 638px;
         clicked => {
-            root.cancel_option();
+            root.save_option();
         }
     }
     Button {
-        text: "Save";
+        text: "Cancel";
         width: 65px;
-        y: 648px;
-        x: 710px;
+        y: 552px;
+        x: 711px;
         clicked => {
-            root.save_option();
+            root.cancel_option();
         }
     }
 }

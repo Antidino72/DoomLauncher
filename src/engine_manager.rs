@@ -42,7 +42,7 @@ pub fn save_config(config: &Vec<Engine>) -> Result<(), Box<dyn std::error::Error
     fs::write("engines.toml", toml)?;
     Ok(())
 }
-pub fn create_config() -> Result<(), Box<dyn std::error::Error>> {
+pub fn create_config_engines() -> Result<(), Box<dyn std::error::Error>> {
     let config = Engines{
         engine : vec![
             Engine::new("GZDoom", Option::from(PathBuf::new()), Option::from(PathBuf::new()), Option::from("".to_string())),

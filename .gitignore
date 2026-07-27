@@ -1,2 +1,5 @@
 /target
 engines.toml
+iwads.toml
+Cargo.lock
+/.idea

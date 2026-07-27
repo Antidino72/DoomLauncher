@@ -4,15 +4,16 @@
 use slint::{ModelRc, VecModel, SharedString};
 use std::rc::Rc;
 use std::cell::RefCell;
-
-use crate::config::{create_config, load_engines, Engine, save_config};
+use crate::engine_manager::{create_config_engines, load_engines, Engine, save_config};
 
 slint::include_modules!();
 
-mod config;
-use rfd::{FileDialog, MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
+mod engine_manager;
+mod iwads_manager;
 
-// J'ai modifié la signature pour accepter &[Engine] ce qui est plus idiomatique en Rust
+use rfd::{FileDialog, MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
+use crate::iwads_manager::{create_config_iwads, load_iwads, Iwad, save_config_iwads, Iwads};
+
 fn update_list_engine(window: &MainWindow, engines: &[Engine]) {
     window.set_engines(
         ModelRc::new(
@@ -20,7 +21,17 @@ fn update_list_engine(window: &MainWindow, engines: &[Engine]) {
         )
     );
 }
+fn update_list_iwads(window: &MainWindow, iwads: &Iwads) {
 
+    let items: Vec<SharedString> = iwads
+        .iwad
+        .iter()
+        .map(|item| SharedString::from(&item.name))
+        .collect();
+
+    let model = VecModel::from(items);
+    window.set_iwads(ModelRc::new(model));
+}
 fn get_name_of_engines(engines: &[Engine]) -> Vec<SharedString> {
     engines
         .iter()
@@ -29,8 +40,11 @@ fn get_name_of_engines(engines: &[Engine]) -> Vec<SharedString> {
 }
 
 fn main() -> Result<(), slint::PlatformError> {
-    if let Err(e) = create_config() {
-        println!("Erreur lors de la création du fichier config : {e}");
+    if let Err(e) = create_config_engines() {
+        println!("Erreur lors de la création du fichier config engines: {e}");
+    }
+    if let Err (e) = create_config_iwads(){
+        println!("Erreur lors de la création du fichier config iwads: {e}");
     }
 
     let window = MainWindow::new()?;
@@ -39,9 +53,8 @@ fn main() -> Result<(), slint::PlatformError> {
     //==================================================
     //            ENGINE SYSTEM
     //==================================================
-    // 1. On enveloppe les moteurs dans Rc et RefCell pour pouvoir les partager
+    // On enveloppe les moteurs dans Rc et RefCell pour pouvoir les partager
     let engines = Rc::new(RefCell::new(load_engines()));
-
     update_list_engine(&window, &engines.borrow());
 
     // --- Configuration du bouton AJOUTER ---
@@ -73,7 +86,7 @@ fn main() -> Result<(), slint::PlatformError> {
         let result = MessageDialog::new()
             .set_level(MessageLevel::Warning)
             .set_title("Confirmation")
-            .set_description("Es-tu sûr de vouloir supprimer ce moteur ?")
+            .set_description("Are you sure you want to remove this engine?")
             .set_buttons(MessageButtons::YesNo)
             .show();
 
@@ -91,10 +104,10 @@ fn main() -> Result<(), slint::PlatformError> {
                 engines_remove.borrow_mut().push(Engine::new("Empty", None, None, None))
             }
 
-            // NOUVEAU : On met à jour l'interface visuelle après la suppression
+            // On met à jour l'interface visuelle après la suppression
             update_list_engine(window, &engines_remove.borrow());
 
-            // NOUVEAU : On sauvegarde la configuration après la suppression
+            //   On sauvegarde la configuration après la suppression
             if let Err(e) = save_config(&engines_remove.borrow()) {
                 println!("Erreur lors de la sauvegarde : {e}");
             }
@@ -110,10 +123,10 @@ fn main() -> Result<(), slint::PlatformError> {
         }
         let engines_ref = engines.borrow();
         if let Some(current_engine) = engines_ref.get(index as usize) {
-            // 1. Nom de l'engine
-            window.set_name_engine(slint::SharedString::from(&current_engine.name));
+            //Nom de l'engine
+            window.set_name_engine(SharedString::from(&current_engine.name));
 
-            // 2. Exécutable
+            // Exécutable
             let exec_str = current_engine.executable.to_string_lossy();
             window.set_executable(SharedString::from(exec_str.as_ref()));
 
@@ -122,13 +135,13 @@ fn main() -> Result<(), slint::PlatformError> {
             let path_str = icon_path.to_string_lossy();
 
             if !path_str.is_empty() {
-                window.set_icon_path(slint::SharedString::from(path_str.as_ref()));
+                window.set_icon_path(SharedString::from(path_str.as_ref()));
 
                 if let Ok(img) = slint::Image::load_from_path(icon_path) {
                     window.set_icon_engine(img);
                 }
             } else {
-                window.set_icon_path(slint::SharedString::from(""));
+                window.set_icon_path(SharedString::from(""));
                 window.set_icon_engine(slint::Image::default());
             }
         }
@@ -139,14 +152,68 @@ fn main() -> Result<(), slint::PlatformError> {
         let window = &window_handle_option;
         window.set_option_open(false);
     });
-    let window_handle_option = window.clone_strong();
-    window.on_save_option(move || {
-        let window = &window_handle_option;
-        
+    //==================================================
+    //            IWADS SYSTEM
+    //==================================================
+    let iwads = Rc::new(RefCell::new(load_iwads()));
+    update_list_iwads(&window, &iwads.borrow());
+
+    let iwads_add = iwads.clone();
+    let window_handle_iwad = window.clone_strong();
+    window.on_add_iwad(move || {
+        let window =  &window_handle_iwad;
+        if let Some(path) = FileDialog::new().pick_file() {
+            iwads_add.borrow_mut().iwad.push(Iwad::from_path(path));
+            update_list_iwads(window, &iwads_add.borrow());
+            if let Err(e) = save_config_iwads(&iwads_add.borrow()) {
+                eprintln!("Erreur lors de la sauvegarde : {}", e);
+            }
+        }
     });
+    let window_handle_iwad = window.clone_strong();
+    let iwads_add = iwads.clone();
+
+    window.on_remove_iwad(move || {
+        let window = window_handle_iwad.clone_strong();
 
 
+        let selected_index = window.get_selected_iwad();
+        if selected_index < 0 {
+            return; // Aucun IWAD sélectionné dans l'interface
+        }
+        let index = selected_index as usize;
 
+        // 2. Demande de confirmation
+        let result_iwad = MessageDialog::new()
+            .set_level(MessageLevel::Warning)
+            .set_title("Confirmation")
+            .set_description("Êtes-vous sûr de vouloir supprimer cet IWAD ?")
+            .set_buttons(MessageButtons::YesNo)
+            .show();
+
+        if result_iwad == MessageDialogResult::Yes {
+            let mut iwads_borrow = iwads_add.borrow_mut();
+
+            // 3. Suppression sécurisée
+            if index < iwads_borrow.iwad.len() {
+                iwads_borrow.iwad.remove(index);
+                println!("IWAD à l'index {} supprimé", index);
+
+                // Si la liste devient vide, on peut rajouter un élément par défaut si souhaité
+                if iwads_borrow.iwad.is_empty() {
+                    iwads_borrow.iwad.push(Iwad::new());
+                }
+
+                // 4. Mettre à jour l'interface visuelle
+                update_list_iwads(&window, &iwads_borrow);
+
+                // 5. Sauvegarder la configuration sur disque
+                if let Err(e) = save_config_iwads(&iwads_borrow) {
+                    eprintln!("Erreur lors de la sauvegarde : {e}");
+                }
+            }
+        }
+    });
     window.on_launch(|| {
 
         println!("Lancement de Doom !");

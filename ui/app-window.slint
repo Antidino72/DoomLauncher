@@ -1,78 +1,97 @@
 // Copyright (c) 2026 Antoine Veillé
 // SPDX-License-Identifier: CC-BY-SA-4.0
 
-import { Header } from "header.slint";
-import { EngineSelector } from "engine-selector.slint";
-import { BottomBar } from "bottom-bar.slint";
-import { EditEngineDialog } from "edit-engine-dialog.slint";
+import { Header } from "design/header.slint";
+import { EngineSelector } from "engine/engine-selector.slint";
+import { iwad_selector } from "wads/iwad_selector.slint";
+import { EditEngineDialog } from "engine/edit-engine-dialog.slint";
 
 export component MainWindow inherits Window {
-    callback cancel_option();
-    callback save_option();
-    callback option();
-    callback launch();
+
+    //engine system
     callback remove_engine();
     callback add_engine();
-    in property <bool> option_open;
-    in property <[string]> engines;
     in-out property <int> selected-engine;
+    in property <[string]> engines;
 
     //option engines
+    callback option();
+    callback save_option();
+    callback cancel_option();
+
+    in property <bool> option_open;
+
     in property <string> executable;
     in property <string> name_engine;
     in property <image> icon-engine;
     in property <string> icon-path;
+
+    //iwads system
+    callback add_iwad();
+    callback remove_iwad();
+
+    in-out property <int> selected-iwad;
+    in property <[string]> iwads;
+
+    //launch system
+    callback launch();
 
     width: 800px;
     height: 600px;
 
     title: "DoomLauncher";
     icon: @image-url("../icon.png");
-
     Header {
+            y: 8px;
+            height: 62px;
+            width: 446px;
+            x: 20px;}
 
+    EngineSelector {
+                y: 160px;
+                x: 10px;
+                visible: !option_open;
+                engines: root.engines;
+
+                selected-engine <=> root.selected-engine;
+                add => {
+                    root.add_engine();
+                }
+                remove => {
+                    root.remove_engine();
+                }
+                option => {
+                    root.option();
+                }
+            }
+    iwad-selector {
+        height: 105px;
+        y: 200px;
+        x: 15px;
+        visible: !option_open;
+        iwads: iwads;
+        selected-iwad <=> root.selected-iwad;
+        add_iwad => {
+            root.add_iwad()
+        }
+        remove_iwad => {
+            root.remove_iwad()
+        }
     }
     EditEngineDialog {
-        visible: option_open;
-        cancel_option => {
-            root.cancel_option();
-        }
-        save_option => {
-            root.save_option();
-        }
-        executable: root.executable;
-        name: root.name_engine;
-        icon-engine: root.icon-engine;
-        icon-path: root.icon-path;
+                visible: option_open;
+                y: 1px;
+                cancel_option => {
+                    root.cancel_option();
+                }
+                save_option => {
+                    root.save_option();
+                }
+                height: 407px;
+                executable: root.executable;
+                name: root.name_engine;
+                icon-engine: root.icon-engine;
+                icon-path: root.icon-path;
 
-    }
-    EngineSelector {
-
-        x: 0px;
-        y: 184px;
-        visible: !option_open;
-        engines: root.engines;
-
-        selected-engine <=> root.selected-engine;
-        add => {
-            root.add_engine();
-        }
-        remove => {
-            root.remove_engine();
-        }
-        option => {
-            root.option();
-        }
-    }
-
-    BottomBar {
-
-        x: 0px;
-        y: 552px;
-
-        launch => {
-            root.launch();
-        }
-        visible: !option_open;
     }
 }
