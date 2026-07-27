@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Antoine Veillé
+// SPDX-License-Identifier: CC-BY-SA-4.0
+
 import { Header } from "header.slint";
 import { EngineSelector } from "engine-selector.slint";
 import { BottomBar } from "bottom-bar.slint";
@@ -5,6 +8,7 @@ import { EditEngineDialog } from "edit-engine-dialog.slint";
 
 export component MainWindow inherits Window {
     callback cancel_option();
+    callback save_option();
     callback option();
     callback launch();
     callback remove_engine();
@@ -12,6 +16,12 @@ export component MainWindow inherits Window {
     in property <bool> option_open;
     in property <[string]> engines;
     in-out property <int> selected-engine;
+
+    //option engines
+    in property <string> executable;
+    in property <string> name_engine;
+    in property <image> icon-engine;
+    in property <string> icon-path;
 
     width: 800px;
     height: 600px;
@@ -27,6 +37,14 @@ export component MainWindow inherits Window {
         cancel_option => {
             root.cancel_option();
         }
+        save_option => {
+            root.save_option();
+        }
+        executable: root.executable;
+        name: root.name_engine;
+        icon-engine: root.icon-engine;
+        icon-path: root.icon-path;
+
     }
     EngineSelector {
 

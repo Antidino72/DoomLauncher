@@ -1,17 +1,23 @@
+// Copyright (c) 2026 Antoine Veillé
+// SPDX-License-Identifier: CC-BY-SA-4.0
+
 import { Button, LineEdit, TextEdit, TextEdit, TextEdit, HorizontalBox } from "std-widgets.slint";
 import { Header } from "header.slint";
 export component EditEngineDialog inherits Rectangle {
     in-out property <bool> open;
-    in-out property <string> name;
-    in-out property <string> executable;
-    in-out property <string> icon;
+    in property <string> name;
+    in property <string> executable;
+    in property <image> icon-engine;
+    in property <string> icon-path;
     visible: root.open;
-    callback save();
+    callback save_option();
     callback cancel_option();
     width: 800px;
     height: 800px;
     Header {
         y: -1px;
+        height: 62px;
+        width: 446px;
         x: 424px;}
 
     //name of engine
@@ -25,7 +31,7 @@ export component EditEngineDialog inherits Rectangle {
     LineEdit {
         height: 30px;
         font-size: 24px;
-        text: name;
+        text: root.name;
         y: 209px;
         x: 60px;
         width: 350px;
@@ -42,15 +48,10 @@ export component EditEngineDialog inherits Rectangle {
     LineEdit {
         font-size: 20px;
         height: 30px;
-        text: executable;
-        y: 466px;
+        text: root.executable;
+        y: 366px;
         width: 350px;
         x: 60px;
-    }
-    Button {
-        text: "Change path";
-        y: 466px;
-        x: 417px;
     }
 
     //icon path
@@ -60,21 +61,28 @@ export component EditEngineDialog inherits Rectangle {
         y: 428px;
         x: 64px;
     }
-    Image {
-        height: 40px;
-        source: @image-url("../icon.png");
-        y: 464px;
-        width: 40px;
-        x: 526px;
+    TouchArea {
+        Rectangle {
+            border-color: #ffffff;
+        }
+        Image {
+            source: root.icon-engine;
+            height: 40px;
+            y : 458px;
+            width: 40px;
+            x: 420px;
+        }
     }
     LineEdit {
         font-size: 20px;
         height: 30px;
-        text: icon;
-        y: 366px;
+        text: root.icon-path;
+        y: 466px;
         width: 350px;
         x: 60px;
     }
+
+
     Button {
         text: "Change path";
         y: 366px;
@@ -98,7 +106,7 @@ export component EditEngineDialog inherits Rectangle {
         y: 648px;
         x: 710px;
         clicked => {
-            root.cancel_option();
+            root.save_option();
         }
     }
 }

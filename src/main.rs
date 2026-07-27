@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Antoine Veillé
+// SPDX-License-Identifier: CC-BY-SA-4.0
+
 use slint::{ModelRc, VecModel, SharedString};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -32,6 +35,10 @@ fn main() -> Result<(), slint::PlatformError> {
 
     let window = MainWindow::new()?;
 
+
+    //==================================================
+    //            ENGINE SYSTEM
+    //==================================================
     // 1. On enveloppe les moteurs dans Rc et RefCell pour pouvoir les partager
     let engines = Rc::new(RefCell::new(load_engines()));
 
@@ -94,8 +101,37 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
     let window_handle_option = window.clone_strong();
+
     window.on_option(move || {
-        let window = &window_handle_option;
+        let window = window_handle_option.clone_strong();
+        let index = window.get_selected_engine();
+        if index < 0 {
+            return; // Aucun élément sélectionné
+        }
+        let engines_ref = engines.borrow();
+        if let Some(current_engine) = engines_ref.get(index as usize) {
+            // 1. Nom de l'engine
+            window.set_name_engine(slint::SharedString::from(&current_engine.name));
+
+            // 2. Exécutable
+            let exec_str = current_engine.executable.to_string_lossy();
+            window.set_executable(SharedString::from(exec_str.as_ref()));
+
+            // 3. Icône (Si optionnel)
+            let icon_path = &current_engine.icon;
+            let path_str = icon_path.to_string_lossy();
+
+            if !path_str.is_empty() {
+                window.set_icon_path(slint::SharedString::from(path_str.as_ref()));
+
+                if let Ok(img) = slint::Image::load_from_path(icon_path) {
+                    window.set_icon_engine(img);
+                }
+            } else {
+                window.set_icon_path(slint::SharedString::from(""));
+                window.set_icon_engine(slint::Image::default());
+            }
+        }
         window.set_option_open(true);
     });
     let window_handle_option = window.clone_strong();
@@ -103,6 +139,14 @@ fn main() -> Result<(), slint::PlatformError> {
         let window = &window_handle_option;
         window.set_option_open(false);
     });
+    let window_handle_option = window.clone_strong();
+    window.on_save_option(move || {
+        let window = &window_handle_option;
+        
+    });
+
+
+
     window.on_launch(|| {
 
         println!("Lancement de Doom !");

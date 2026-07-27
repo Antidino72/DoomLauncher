@@ -1,3 +1,8 @@
+// Copyright (c) 2026 Antoine Veillé
+// SPDX-License-Identifier: CC-BY-SA-4.0
+
+
+use std::string::String;
 use serde::{Serialize,Deserialize};
 use std::{fs, path::{PathBuf,}};
 
@@ -5,7 +10,7 @@ use std::{fs, path::{PathBuf,}};
 pub struct Engine {
     pub name: String,
     pub executable: PathBuf,
-    pub icon: Option<PathBuf>,
+    pub icon: PathBuf,
     pub default_args: String,
 }
 #[derive(Serialize, Deserialize)]
@@ -24,7 +29,7 @@ impl Engine {
         Self {
             name: name.into(),
             executable: executable.unwrap_or_default(),
-            icon,
+            icon : icon.unwrap_or_default(),
             default_args: default_args.unwrap_or_default(),
         }
     }
@@ -40,7 +45,7 @@ pub fn save_config(config: &Vec<Engine>) -> Result<(), Box<dyn std::error::Error
 pub fn create_config() -> Result<(), Box<dyn std::error::Error>> {
     let config = Engines{
         engine : vec![
-            Engine::new("GZDoom", None, None, None),
+            Engine::new("GZDoom", Option::from(PathBuf::new()), Option::from(PathBuf::new()), Option::from("".to_string())),
         ]
     };
     let toml_string = toml::to_string_pretty(&config)?;
